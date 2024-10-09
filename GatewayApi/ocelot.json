@@ -1,0 +1,39 @@
+﻿{
+  "Routes": [
+    //"GameServerAPI": "https://localhost:10003/api/PlayerRegisterGame/server-info"
+       {
+      "DownstreamPathTemplate": "/api/PlayerRegisterGame/server-info",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 10003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/api/PlayerRegisterGame/server-info",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    }
+    //{
+    //  "DownstreamPathTemplate": "/api/game/join",
+    //  "DownstreamScheme": "http",
+    //  "DownstreamHostAndPorts": [
+    //    {
+    //      "Host": "localhost",
+    //      "Port": 5002
+    //    }
+    //  ],
+    //  "UpstreamPathTemplate": "/game/join",
+    //  "UpstreamHttpMethod": [ "POST" ],
+    //  "AuthenticationOptions": {
+    //    "AuthenticationProviderKey": "Bearer",
+    //    "AllowedScopes": []
+    //  }
+    //}
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:22222"
+  }
+}

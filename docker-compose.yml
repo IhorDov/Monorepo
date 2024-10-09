@@ -1,0 +1,70 @@
+
+version: '3.8'
+services:
+  loginapi:
+    image: loginapi
+    container_name: loginapi
+    networks:
+      - app-network
+    environment:
+      - secretPath=/run/secrets/jwtSecret
+      - ConnectionStrings__DockerLoginDB=Host=postgres-container;Port=5432;Database=LoginAPI;Username=postgres;Password=postgres
+    secrets:
+      - jwtSecret
+    build:
+       context: LoginApi
+       dockerfile: Dockerfile
+    depends_on:
+      - postgres-container
+    ports:
+      - "10001:8080"
+      - "10002:8081"
+    volumes:
+      - C:/Users/45527/Documents/Keys:/home/app/.aspnet/DataProtection-Keys
+      - C:/Users/45527/Documents/cert.pem:/app/cert.pem
+
+  postgres-container:
+    image: postgres:latest
+    container_name: postgres-container
+    networks:
+      - app-network
+    environment:
+      POSTGRES_DB: LoginAPI
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.containers/users-db:/var/lib/postgresql/data
+
+  gameserverapi:
+    image: game_server_api
+    container_name: game_server_api
+    networks:
+      - app-network
+    environment:
+     - secretPath=/run/secrets/jwtSecret 
+    secrets:
+     - jwtSecret
+    build:
+      context: GameServerAPI
+      dockerfile: Dockerfile
+    ports:
+      - "10003:8080"
+      - "10004:8081"
+    volumes:
+      - C:/Users/45527/Documents/Keys:/home/app/.aspnet/DataProtection-Keys
+      - C:/Users/45527/Documents/cert.pem:/app/cert.pem
+
+networks:
+  app-network:
+
+volumes:
+  postgres_data:
+     name: custom_postgres_data
+  
+secrets:
+  jwtSecret:
+    file: ./mysecret.txt
+
+
