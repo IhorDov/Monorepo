@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GameServerAPI.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PlayerRegisterGame : ControllerBase
@@ -29,6 +30,13 @@ namespace GameServerAPI.Controllers
                 .FirstOrDefault()?.Split(" ").Last();
             Console.WriteLine($"token from PlayerRegisterGame controller: {token}");
 
+            // Verify the token and check the role
+            //var result = _gameServerService.VerifyJWT(token).Result;
+            //if (result == "Failed")
+            //{
+            //    return Unauthorized("Invalid token");
+            //}
+
             // Use the GameServerService to get IP and Port
             var serverInfo = _gameServerService.GetGameServer();
 
@@ -36,3 +44,4 @@ namespace GameServerAPI.Controllers
         }
     }
 }
+

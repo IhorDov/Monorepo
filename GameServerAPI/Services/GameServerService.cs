@@ -1,4 +1,7 @@
 ﻿using GameServerAPI.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace GameServerAPI.Services
 {

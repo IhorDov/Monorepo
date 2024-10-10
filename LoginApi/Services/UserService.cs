@@ -61,8 +61,9 @@ namespace LoginApi.Services
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName), //ClaimTypes.NameIdentifier - using DB
-                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim(ClaimTypes.Name, user.UserName) //ClaimTypes.NameIdentifier - using DB
+                //new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                //new Claim(ClaimTypes.Role, "Admin"),
             };
 
             // Use the token from the configuration which was set from .env in Program.cs
@@ -73,11 +74,14 @@ namespace LoginApi.Services
             var token = new JwtSecurityToken(
                     claims: claims,
                     expires: DateTime.Now.AddDays(1),
-                    signingCredentials: credentials
+                    signingCredentials: credentials,
+                    issuer: "http://loginapi"
                 );
 
             //Last step is to write the token
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            Console.WriteLine($"Generated JWT: {jwt}");
 
             return jwt;
         }
