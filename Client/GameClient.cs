@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Text;
 
+
 namespace Client
 {
     public class GameClient
