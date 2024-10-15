@@ -1,16 +1,15 @@
 ﻿using Client;
 using Client.Models;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 
 var gameClient = new GameClient();
 var user = new User();
-var game = new GameWorld();
+//var game = new GameWorld();
 
-
-Console.WriteLine("Welcome! You need to register or login to access the game.");
-Console.WriteLine("Available commands: 'login', 'register', 'connect', 'exit'");
+Greeting();
 
 bool isPlaying = true;
 string jwtToken = null!;
@@ -47,7 +46,7 @@ async Task MainLoop()
                 if (!string.IsNullOrEmpty(jwtToken))
                 {
                     await ConnectToGameServer();
-                    game.Run();
+                    //game.Run();
                 }
                 else
                 {
@@ -239,4 +238,11 @@ async Task ConnectToGameServer()
     }
 }
 
+void Greeting()
+{
+    Console.WriteLine("Welcome! You need to register or login to access the game.");
+    Console.WriteLine("Available commands: 'login', 'register', 'connect', 'exit'");
+}
+
 Console.ReadKey();
+
