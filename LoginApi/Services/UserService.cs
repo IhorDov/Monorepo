@@ -57,6 +57,17 @@ namespace LoginApi.Services
             return await _repository.GetAllItems<User>();
         }
 
+        public async Task DeleteUser(int id)
+        {
+
+            await _repository.RemoveItem<User>(x => x.Id == id);
+        }
+
+        public async Task DeleteAll()
+        {
+            await _repository.RemoveItems<User>(x => x.Where(z => z.UserName != string.Empty));
+        }
+
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
