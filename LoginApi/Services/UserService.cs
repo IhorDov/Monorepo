@@ -39,16 +39,23 @@ namespace LoginApi.Services
             }
         }
 
-        public async Task<string> LoginUser(UserDto userDto)
+        public async Task<string?> LoginUser(UserDto userDto)
         {
+            // Check if user exists in the repository
             var existingUser = await _repository.GetItem<User>(u => u.Where(x => x.UserName == userDto.UserName));
 
+            // Validate the password using BCrypt
             if (existingUser != null && BCrypt.Net.BCrypt.Verify(userDto.Password, existingUser.Password))
             {
-                Console.WriteLine("User was login successful");
+                // Log the successful login attempt
+                Console.WriteLine("User login successful");
+
+                // Return the JWT token
                 return CreateToken(existingUser);
             }
-            return "Invalid username or password";
+
+            // Return null if authentication fails
+            return null;
         }
 
         public async Task<List<User>> GetAllUsers()

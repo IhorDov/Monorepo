@@ -33,8 +33,17 @@ namespace LoginApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserDto userDto)
         {
-            var result = await _userService.LoginUser(userDto);
-            return Ok(result);
+            // Call the service to authenticate the user and get the token
+            var token = await _userService.LoginUser(userDto);
+
+            if (token != null)
+            {
+                // Return a 200 OK response with the JWT token if authentication is successful
+                return Ok(new { Token = token });
+            }
+
+            // Return 401 Unauthorized if authentication fails
+            return Unauthorized("Invalid username or password");
         }
 
         [HttpGet("users")]

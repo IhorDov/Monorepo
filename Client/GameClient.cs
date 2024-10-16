@@ -82,7 +82,7 @@ namespace Client
             try
             {
                 // Define the URL of the endpoint
-                string serverInfoUrl = "https://localhost:10003/api/PlayerRegisterGame/server-info";
+                string serverInfoUrl = "http://localhost:10003/api/PlayerRegisterGame/server-info";
                 Console.WriteLine($"Requesting game server info from {serverInfoUrl}");
 
                 // Send the GET request
