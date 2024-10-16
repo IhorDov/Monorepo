@@ -4,6 +4,6 @@ namespace GameServerAPI.Services
 {
     public interface IGameServerService
     {
-        GameServerInfo GetGameServer();
+        GameServerInfo GetGameServer();       
     }
 }
