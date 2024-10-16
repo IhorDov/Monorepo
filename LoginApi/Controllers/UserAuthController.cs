@@ -43,5 +43,22 @@ namespace LoginApi.Controllers
             var result = await _userService.GetAllUsers();
             return Ok(result);
         }
+
+        [HttpDelete("deleteall")]
+        public async Task<IActionResult> DeleteAllUsers()
+        {
+            await _userService.DeleteAll();
+
+            return Ok("All users deleted successfully");
+        }
+
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            await _userService.DeleteUser(id);
+
+            return Ok("User deleted successfully");
+        }
+
     }
 }

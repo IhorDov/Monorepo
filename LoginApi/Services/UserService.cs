@@ -57,6 +57,17 @@ namespace LoginApi.Services
             return await _repository.GetAllItems<User>();
         }
 
+        public async Task DeleteUser(int id)
+        {
+
+            await _repository.RemoveItem<User>(x => x.Id == id);
+        }
+
+        public async Task DeleteAll()
+        {
+            await _repository.RemoveItems<User>(x => x.Where(z => z.UserName != string.Empty));
+        }
+
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>
@@ -71,12 +82,20 @@ namespace LoginApi.Services
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
+            //var token = new JwtSecurityToken(
+            //        claims: claims,
+            //        expires: DateTime.Now.AddDays(1),
+            //        signingCredentials: credentials,
+            //        issuer: "http://loginapi"
+            //    );
+
             var token = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.Now.AddDays(1),
-                    signingCredentials: credentials,
-                    issuer: "http://loginapi"
-                );
+                issuer: "http://loginapi",
+                audience: "http://loginapi",
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: credentials
+            );
 
             //Last step is to write the token
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
