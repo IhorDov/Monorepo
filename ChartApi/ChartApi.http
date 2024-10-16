@@ -1,6 +1,0 @@
-@ChartApi_HostAddress = http://localhost:5250
-
-GET {{ChartApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

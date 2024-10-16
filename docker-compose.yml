@@ -26,23 +26,23 @@ services:
        context: LoginApi
        dockerfile: Dockerfile
     depends_on:
-      - postgres-container
+      - postgres
     ports:
       - "10001:8080"
       - "10002:8081"
     volumes:
       - C:/Users/45527/Documents/Keys:/home/app/.aspnet/DataProtection-Keys
       - C:/Users/45527/Documents/cert.pem:/app/cert.pem
-
-  postgres-container:
+  
+  postgres:
     container_name: postgres-container
     image: postgres:latest
     networks:
       - app-network
     environment:
-      POSTGRES_DB: LoginAPI
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      postgres_db: loginapi
+      postgres_user: postgres
+      postgres_password: postgres
     ports:
       - "5432:5432"
     volumes:
@@ -66,6 +66,26 @@ services:
     volumes:
       - C:/Users/45527/Documents/Keys:/home/app/.aspnet/DataProtection-Keys
       - C:/Users/45527/Documents/cert.pem:/app/cert.pem
+
+  chatapi:
+    container_name: chatapi
+    image: chatapi
+    networks:
+      - app-network
+    environment:
+      - secretPath=/run/secrets/jwtSecret
+    secrets:
+      - jwtSecret
+    build:
+      context: ChatApi
+      dockerfile: Dockerfile
+    ports:
+      - "10005:8080"
+      - "10006:8081"
+    volumes:
+      - C:/Users/45527/Documents/Keys:/home/app/.aspnet/DataProtection-Keys
+      - C:/Users/45527/Documents/cert.pem:/app/cert.pem
+
 
 networks:
   app-network:

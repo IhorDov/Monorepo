@@ -1,6 +1,5 @@
 ﻿using GameServerAPI.Models;
 using GameServerAPI.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameServerAPI.Controllers
@@ -12,23 +11,27 @@ namespace GameServerAPI.Controllers
     public class PlayerRegisterGame : ControllerBase
     {
         private readonly IGameServerService _gameServerService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
 
-        // Constructor injection for GameServerService
-        public PlayerRegisterGame(IGameServerService gameServerService, IHttpContextAccessor httpContextAccessor)
+        ////Constructor injection for GameServerService
+        //public PlayerRegisterGame(IGameServerService gameServerService, IHttpContextAccessor httpContextAccessor)
+        //{
+        //    _gameServerService = gameServerService;
+        //    _httpContextAccessor = httpContextAccessor;
+        //}
+
+        public PlayerRegisterGame(IGameServerService gameServerService)
         {
             _gameServerService = gameServerService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        // Endpoint to return IP and Port
         [HttpGet("server-info")]
         public ActionResult<GameServerInfo> GetServerInfo()
         {
             // Extract the token from the Authorization header
-            var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
-                .FirstOrDefault()?.Split(" ").Last();
-            Console.WriteLine($"token from PlayerRegisterGame controller: {token}");
+            //var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"]
+            //    .FirstOrDefault()?.Split(" ").Last();
+            //Console.WriteLine($"token from PlayerRegisterGame controller: {token}");
 
             // Verify the token and check the role
             //var result = _gameServerService.VerifyJWT(token).Result;
@@ -42,6 +45,7 @@ namespace GameServerAPI.Controllers
 
             return Ok(serverInfo); // Return the server info
         }
+        
     }
 }
 
