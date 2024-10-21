@@ -1,6 +1,5 @@
 ﻿using LoginApi.Models;
 using LoginApi.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoginApi.Controllers

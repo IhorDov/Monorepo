@@ -89,13 +89,6 @@ namespace LoginApi.Services
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-            //var token = new JwtSecurityToken(
-            //        claims: claims,
-            //        expires: DateTime.Now.AddDays(1),
-            //        signingCredentials: credentials,
-            //        issuer: "http://loginapi"
-            //    );
-
             var token = new JwtSecurityToken(
                 issuer: "http://loginapi",
                 audience: "http://loginapi",

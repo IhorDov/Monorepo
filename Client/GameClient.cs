@@ -9,7 +9,7 @@ namespace Client
     public class GameClient
     {
         private readonly HttpClient client;
-        //private const string baseUrl = "https://localhost:10002/api/auth/"; //does not work nowgit status
+        
         private const string baseUrl = "http://localhost:10001/api/auth/";
 
         public GameClient()
@@ -70,7 +70,6 @@ namespace Client
             }
         }
 
-        // Retrieve game server IP and port from the GameServer
         public async Task<GameServerInfo> GetGameServer(string jwt)
         {
             // Clear the default request headers

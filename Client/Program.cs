@@ -3,10 +3,8 @@ using Client.Models;
 using System.Net.Sockets;
 using System.Text;
 
-
 var gameClient = new GameClient();
 var user = new User();
-//var game = new GameWorld();
 
 Greeting();
 
@@ -29,7 +27,7 @@ async Task MainLoop()
 
                 if (!string.IsNullOrEmpty(jwtToken))
                 {
-                    await SentJWTToMainGameServer(jwtToken);
+                    await SendJwtToMainGameServer(jwtToken);
                 }
                 else
                 {
@@ -45,7 +43,6 @@ async Task MainLoop()
                 if (!string.IsNullOrEmpty(jwtToken))
                 {
                     await ConnectToGameServer();
-                    //game.Run();
                 }
                 else
                 {
@@ -79,10 +76,10 @@ async Task LoginAsync()
         {
             jwtToken = await gameClient.Login(user);
 
-            if (!string.IsNullOrEmpty(jwtToken))  // Check if a token is returned
+            if (!string.IsNullOrEmpty(jwtToken))
             {
                 Console.WriteLine("Login successful! You are now logged in.");
-                await PromptForConnect(); // Ask to connect to game server
+                await PromptForConnect();
             }
             else
             {
@@ -91,11 +88,10 @@ async Task LoginAsync()
         }
         catch (LoginException ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"{ex.Message} \n{ex.StackTrace}");
         }
     }
 }
-
 
 async Task RegisterAsync()
 {
@@ -118,17 +114,17 @@ async Task RegisterAsync()
             if (!string.IsNullOrEmpty(jwtToken))
             {
                 Console.WriteLine("Login successful! You are now logged in.");
-                await PromptForConnect(); // Ask to connect to game server
+                await PromptForConnect();
             }
         }
         catch (RegistrationException ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"{ex.Message} \n{ex.StackTrace}");
         }
         catch (LoginException ex)
         {
             Console.WriteLine("Login failed after registration. Please try logging in manually.");
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"{ex.Message} \n{ex.StackTrace}");
         }
     }
 }
@@ -144,11 +140,8 @@ async Task PromptForConnect()
 
         if (connectInput == "yes" && !string.IsNullOrEmpty(jwtToken))
         {
-            //Console.WriteLine($"jwtToken from PromptForConnect: {jwtToken}");
-
             await ConnectToGameServer();
             isValidInput = true; // Exit loop after handling the "yes" case
-
         }
         else if (connectInput == "no")
         {
@@ -163,40 +156,37 @@ async Task PromptForConnect()
     }
 }
 
-async Task SentJWTToMainGameServer(string jwtToken)
+async Task SendJwtToMainGameServer(string jwtToken)
 {
     try
     {
-        // Specify the game server's IP and Port
-        string gameServerIP = "127.0.0.1"; // Replace with actual game server IP
-        int gameServerPort = 12345;        // Replace with actual game server port
+        var serverInfo = await gameClient.GetGameServer(jwtToken);
+        await SendDataToServer(serverInfo.IP, serverInfo.Port, jwtToken);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Failed to send JWT to GameServer: {ex.Message} \n{ex.StackTrace}");
+    }
+}
 
-        // Establish TCP connection to the game server
-        using (var tcpClient = new TcpClient(gameServerIP, gameServerPort))
+async Task SendDataToServer(string serverIP, int serverPort, string jwtToken)
+{
+    try
+    {
+        using (var tcpClient = new TcpClient(serverIP, serverPort))
         {
-            Console.WriteLine($"Connecting to GameServer at {gameServerIP}:{gameServerPort}...");
+            Console.WriteLine($"Connecting to GameServer at {serverIP}:{serverPort}...");
 
-            // Get the stream to send data
             NetworkStream stream = tcpClient.GetStream();
-
-            // Convert the JWT to bytes
             var jwtBytes = Encoding.UTF8.GetBytes(jwtToken);
+            var message = new byte[jwtBytes.Length + 4];
 
-            // Optionally, you can add a header (like the length of the message)
-            var message = new byte[jwtBytes.Length + 4]; // 4 bytes for length header
-
-            // Add the length of the JWT as a header (optional)
             BitConverter.GetBytes(jwtBytes.Length).CopyTo(message, 0);
-
-            // Copy the JWT bytes into the message array
             jwtBytes.CopyTo(message, 4);
 
-            // Send the message (JWT with header)
             await stream.WriteAsync(message, 0, message.Length);
-
             Console.WriteLine("JWT sent to the GameServer. Waiting for server response...");
 
-            // Buffer to read response from the server
             byte[] buffer = new byte[1024];
             int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
             string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead);
@@ -206,23 +196,20 @@ async Task SentJWTToMainGameServer(string jwtToken)
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Failed to send JWT to GameServer: {ex.Message}");
+        Console.WriteLine($"Error sending data to server: {ex.Message}");
     }
 }
-
 
 async Task ConnectToGameServer()
 {
     try
     {
         var serverInfo = await gameClient.GetGameServer(jwtToken);
-
-        Console.WriteLine($"Received Server Info: IP = {serverInfo.IP}, Port = {serverInfo.Port}");
-        Console.WriteLine($"Connecting to GameServer at {serverInfo.IP}:{serverInfo.Port}");
-
         var success = await GameClient.ConnectToGameServer(serverInfo.IP, serverInfo.Port);
         if (success)
         {
+            var game = new Game1(serverInfo.IP, serverInfo.Port);
+            game.StartGame();
             Console.WriteLine("Connected to GameServer! You can now play the game.");
         }
         else
@@ -244,4 +231,3 @@ void Greeting()
 }
 
 Console.ReadKey();
-
