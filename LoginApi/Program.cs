@@ -69,7 +69,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient(typeof(IAsyncRepository<>), typeof(AsyncRepository<>));
 
 var connection = builder.Configuration.GetConnectionString("DockerLoginDB");

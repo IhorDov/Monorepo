@@ -78,26 +78,29 @@ async Task<string?> ReceiveJWTFromClient()
         // Read the length header (first 4 bytes)
         byte[] lengthBuffer = new byte[4];
         int bytesRead = await stream.ReadAsync(lengthBuffer, 0, lengthBuffer.Length);
+        Console.WriteLine($"Read {bytesRead} bytes for JWT length header.");
 
         if (bytesRead == 4)
         {
             // Convert the length header to an integer
             int jwtLength = BitConverter.ToInt32(lengthBuffer, 0);
+            Console.WriteLine($"JWT length header indicates {jwtLength} bytes.");
 
             // Prepare buffer to receive the JWT
             byte[] jwtBuffer = new byte[jwtLength];
             bytesRead = await stream.ReadAsync(jwtBuffer, 0, jwtBuffer.Length);
+            Console.WriteLine($"Read {bytesRead} bytes for JWT.");
 
             if (bytesRead == jwtLength)
             {
                 // Convert JWT byte array back to string
                 string receivedJwt = Encoding.UTF8.GetString(jwtBuffer);
+                Console.WriteLine("JWT received successfully.");
 
-                 // Send a response back to the client
+                // Send a response back to the client
                 string responseMessage = "JWT received and processed successfully.";
                 byte[] responseBuffer = Encoding.UTF8.GetBytes(responseMessage);
                 await stream.WriteAsync(responseBuffer, 0, responseBuffer.Length);
-
                 Console.WriteLine("Response sent to client.");
 
                 // Close the client connection
@@ -127,6 +130,7 @@ async Task<string?> ReceiveJWTFromClient()
     // Return null if there was an error
     return null;
 }
+
 
 
 
