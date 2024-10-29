@@ -8,7 +8,7 @@ using System.Text;
 
 namespace LoginApi.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IAsyncRepository<UserDbContext> _repository;
         private readonly IConfiguration _configuration;
@@ -38,17 +38,25 @@ namespace LoginApi.Services
                 throw new Exception("User already exists.");
             }
         }
-
-        public async Task<string> LoginUser(UserDto userDto)
+        
+        public async Task<string?> LoginUser(UserDto userDto)
         {
+            // Check if user exists in the repository
             var existingUser = await _repository.GetItem<User>(u => u.Where(x => x.UserName == userDto.UserName));
 
+            // Validate the password using BCrypt
             if (existingUser != null && BCrypt.Net.BCrypt.Verify(userDto.Password, existingUser.Password))
             {
-                Console.WriteLine("User was login successful");
+                // Log the successful login attempt
+                Console.WriteLine("User login successful");
+
+                // Return the JWT token
                 return CreateToken(existingUser);
             }
-            return "Invalid username or password";
+
+            // Return null if authentication fails
+            Console.WriteLine("User login failed");
+            return null;
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -57,19 +65,20 @@ namespace LoginApi.Services
             return await _repository.GetAllItems<User>();
         }
 
-        public async Task DeleteUser(int id)
-        {
-
-            await _repository.RemoveItem<User>(x => x.Id == id);
-        }
-
-        public async Task DeleteAll()
-        {
-            await _repository.RemoveItems<User>(x => x.Where(z => z.UserName != string.Empty));
-        }
-
         private string CreateToken(User user)
         {
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user), "User cannot be null.");
+            }
+
+            var tokenKey = _configuration.GetSection("AppSettings:Token")?.Value;
+
+            if (string.IsNullOrEmpty(tokenKey))
+            {
+                throw new InvalidOperationException("Token key is not configured correctly!!!!");
+            }
+
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName) //ClaimTypes.NameIdentifier - using DB
@@ -78,16 +87,8 @@ namespace LoginApi.Services
             };
 
             // Use the token from the configuration which was set from .env in Program.cs
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value!));
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            //var token = new JwtSecurityToken(
-            //        claims: claims,
-            //        expires: DateTime.Now.AddDays(1),
-            //        signingCredentials: credentials,
-            //        issuer: "http://loginapi"
-            //    );
 
             var token = new JwtSecurityToken(
                 issuer: "http://loginapi",
@@ -100,7 +101,7 @@ namespace LoginApi.Services
             //Last step is to write the token
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-            Console.WriteLine($"Generated JWT: {jwt}");
+            Console.WriteLine($"Generated JWT in UserService: {jwt}");
 
             return jwt;
         }
